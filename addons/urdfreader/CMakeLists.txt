@@ -23,10 +23,16 @@ ELSE ()
 	SET (RBDL_USE_ROS_URDF_LIBRARY FALSE)
 ENDIF ()
 
+IF (RBDL_BUILD_STATIC)
+SET(RBDL_TARGET rbdl-static)
+ELSEIF()
+set(RBDL_TARGET rbdl)
+ENDIF()
+
 IF (RBDL_USE_ROS_URDF_LIBRARY)
 	#	find_package(Boost REQUIRED COMPONENTS system)
 	SET (URDFREADER_DEPENDENCIES
-		rbdl
+        ${RBDL_TARGET}
 		${urdf_LIBRARIES}
 		#		${Boost_SYSTEM_LIBRARY}
 		)
@@ -56,11 +62,13 @@ ELSE()
 		thirdparty/urdf/boost_replacement/string_split.h
 		)
 	SET (URDFREADER_DEPENDENCIES
-		rbdl
+        ${RBDL_TARGET}
 		)
 ENDIF()
 
 ADD_EXECUTABLE (rbdl_urdfreader_util rbdl_urdfreader_util.cc)
+
+SET(URDFREADER_TARGET "")
 
 IF (RBDL_BUILD_STATIC)
 	ADD_LIBRARY ( rbdl_urdfreader-static STATIC ${URDFREADER_SOURCES} )
@@ -68,13 +76,16 @@ IF (RBDL_BUILD_STATIC)
 	SET_TARGET_PROPERTIES ( rbdl_urdfreader-static PROPERTIES PREFIX "lib")
 	SET_TARGET_PROPERTIES ( rbdl_urdfreader-static PROPERTIES OUTPUT_NAME "rbdl_urdfreader")
 
+    SET(URDFREADER_TARGET rbdl_urdfreader-static)
+
 	TARGET_LINK_LIBRARIES (rbdl_urdfreader-static
-		rbdl-static
+        ${RBDL_TARGET}
+        ${URDFREADER_DEPENDENCIES}
 		)
 
 	TARGET_LINK_LIBRARIES (rbdl_urdfreader_util
 		rbdl_urdfreader-static
-		rbdl-static
+        ${RBDL_TARGET}
 		)
 
 	INSTALL (TARGETS rbdl_urdfreader-static rbdl_urdfreader_util
@@ -86,14 +97,14 @@ ELSE (RBDL_BUILD_STATIC)
 	SET_TARGET_PROPERTIES ( rbdl_urdfreader PROPERTIES
 		VERSION ${RBDL_VERSION}
 		SOVERSION ${RBDL_SO_VERSION}
+    SET(URDFREADER_TARGET rbdl_urdfreader)
   )
 
-	TARGET_LINK_LIBRARIES (rbdl_urdfreader
-		${URDFREADER_DEPENDENCIES}
-		)
 
 	TARGET_LINK_LIBRARIES (rbdl_urdfreader_util
-		rbdl_urdfreader
+        ${URDFREADER_TARGET}
+        ${URDFREADER_DEPENDENCIES}
+        ${urdf_LIBRARIES}
 		)
 
 	INSTALL (TARGETS rbdl_urdfreader rbdl_urdfreader_util
