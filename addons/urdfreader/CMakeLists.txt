@@ -36,6 +36,7 @@ IF (RBDL_USE_ROS_URDF_LIBRARY)
 		${urdf_LIBRARIES}
 		#		${Boost_SYSTEM_LIBRARY}
 		)
+    include_directories(${urdf_INCLUDE_DIRS})
 ELSE()
 	SET (URDFREADER_SOURCES
 		${URDFREADER_SOURCES}
