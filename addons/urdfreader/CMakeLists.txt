@@ -76,7 +76,7 @@ IF (RBDL_BUILD_STATIC)
 
 	SET_TARGET_PROPERTIES ( rbdl_urdfreader-static PROPERTIES PREFIX "lib")
 	SET_TARGET_PROPERTIES ( rbdl_urdfreader-static PROPERTIES OUTPUT_NAME "rbdl_urdfreader")
-
+    target_compile_options(rbdl_urdfreader-static PRIVATE -fPIC)
     SET(URDFREADER_TARGET rbdl_urdfreader-static)
 
 	TARGET_LINK_LIBRARIES (rbdl_urdfreader-static

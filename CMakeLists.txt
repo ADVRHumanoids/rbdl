@@ -93,6 +93,7 @@ IF (RBDL_BUILD_STATIC)
   ADD_LIBRARY ( rbdl-static STATIC ${RBDL_SOURCES} )
   SET_TARGET_PROPERTIES ( rbdl-static PROPERTIES PREFIX "lib")
   SET_TARGET_PROPERTIES ( rbdl-static PROPERTIES OUTPUT_NAME "rbdl")
+  target_compile_options(rbdl-static PRIVATE -fPIC)
 
 	IF (RBDL_BUILD_ADDON_LUAMODEL)
 		TARGET_LINK_LIBRARIES ( rbdl-static
