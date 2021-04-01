@@ -176,7 +176,8 @@ bool construct_model (Model* rbdl_model, ModelPtr urdf_model, bool floating_base
     // determine where to add the current joint and child body
     unsigned int rbdl_parent_id = 0;
 
-    rbdl_parent_id = rbdl_model->GetBodyId (urdf_parent->name.c_str());
+    if(rbdl_model->mBodies.size() != 1)
+      rbdl_parent_id = rbdl_model->GetBodyId (urdf_parent->name.c_str());
 
     if (rbdl_parent_id == std::numeric_limits<unsigned int>::max())
       cerr << "Error while processing joint '" << urdf_joint->name
@@ -308,7 +309,7 @@ RBDL_DLLAPI bool URDFReadFromFile (const char* filename, Model* model, bool floa
     cerr << "Error opening file '" << filename << "'." << endl;
     abort();
   }
-  
+
   // reserve memory for the contents of the file
   string model_xml_string;
   model_file.seekg(0, std::ios::end);
@@ -325,7 +326,7 @@ RBDL_DLLAPI bool URDFReadFromString (const char* model_xml_string, Model* model,
   assert (model);
 
   ModelPtr urdf_model = urdf::parseURDF (model_xml_string);
- 
+
   if (!construct_model (model, urdf_model, floating_base, verbose)) {
     cerr << "Error constructing model from urdf file." << endl;
     return false;
