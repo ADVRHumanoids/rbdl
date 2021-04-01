@@ -8,12 +8,15 @@
 #include <map>
 #include <stack>
 
+
 #ifdef RBDL_USE_ROS_URDF_LIBRARY
 #include <urdf_model/model.h>
 #include <urdf_parser/urdf_parser.h>
+#include <ros/common.h>  // needed for ROS_VERSION_MINOR
 
 #if ROS_VERSION_MINOR <= 12
 
+#include <boost/shared_ptr.hpp>
 typedef boost::shared_ptr<urdf::Link> LinkPtr;
 typedef const boost::shared_ptr<const urdf::Link> ConstLinkPtr;
 typedef boost::shared_ptr<urdf::Joint> JointPtr;
