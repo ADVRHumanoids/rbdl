@@ -78,57 +78,63 @@ bool construct_model (Model* rbdl_model, ModelPtr urdf_model, bool floating_base
 	Matrix3d root_inertial_inertia;
 	double root_inertial_mass;
 
-	if (root->inertial) {
-		root_inertial_mass = root->inertial->mass;
+    auto ine = std::make_shared<urdf::Inertial>();
 
-		root_inertial_position.set (
-				root->inertial->origin.position.x,
-				root->inertial->origin.position.y,
-				root->inertial->origin.position.z);
+    if(root->inertial)
+    {
+        ine = root->inertial;
+    }
 
-		root_inertial_inertia(0,0) = root->inertial->ixx;
-		root_inertial_inertia(0,1) = root->inertial->ixy;
-		root_inertial_inertia(0,2) = root->inertial->ixz;
+    root_inertial_mass = ine->mass;
 
-		root_inertial_inertia(1,0) = root->inertial->ixy;
-		root_inertial_inertia(1,1) = root->inertial->iyy;
-		root_inertial_inertia(1,2) = root->inertial->iyz;
+    root_inertial_position.set (
+            ine->origin.position.x,
+            ine->origin.position.y,
+            ine->origin.position.z);
 
-		root_inertial_inertia(2,0) = root->inertial->ixz;
-		root_inertial_inertia(2,1) = root->inertial->iyz;
-		root_inertial_inertia(2,2) = root->inertial->izz;
+    root_inertial_inertia(0,0) = ine->ixx;
+    root_inertial_inertia(0,1) = ine->ixy;
+    root_inertial_inertia(0,2) = ine->ixz;
 
-		root->inertial->origin.rotation.getRPY (root_inertial_rpy[0], root_inertial_rpy[1], root_inertial_rpy[2]);
+    root_inertial_inertia(1,0) = ine->ixy;
+    root_inertial_inertia(1,1) = ine->iyy;
+    root_inertial_inertia(1,2) = ine->iyz;
 
-		Body root_link = Body (root_inertial_mass,
-				root_inertial_position,
-				root_inertial_inertia);
+    root_inertial_inertia(2,0) = ine->ixz;
+    root_inertial_inertia(2,1) = ine->iyz;
+    root_inertial_inertia(2,2) = ine->izz;
 
-		Joint root_joint (JointTypeFixed);
-		if (floating_base) {
-			root_joint = JointTypeFloatingBase;
-		}
+    ine->origin.rotation.getRPY (root_inertial_rpy[0], root_inertial_rpy[1], root_inertial_rpy[2]);
 
-		SpatialTransform root_joint_frame = SpatialTransform ();
+    Body root_link = Body (root_inertial_mass,
+            root_inertial_position,
+            root_inertial_inertia);
 
-		if (verbose) {
-			cout << "+ Adding Root Body " << endl;
-			cout << "  joint frame: " << root_joint_frame << endl;
-			if (floating_base) {
-				cout << "  joint type : floating" << endl;
-			} else {
-				cout << "  joint type : fixed" << endl;
-			}
-			cout << "  body inertia: " << endl << root_link.mInertia << endl;
-			cout << "  body mass   : " << root_link.mMass << endl;
-			cout << "  body name   : " << root->name << endl;
-		}
+    Joint root_joint (JointTypeFixed);
+    if (floating_base) {
+        root_joint = JointTypeFloatingBase;
+    }
 
-		rbdl_model->AppendBody(root_joint_frame,
-				root_joint,
-				root_link,
-				root->name);
-	}
+    SpatialTransform root_joint_frame = SpatialTransform ();
+
+    if (verbose) {
+        cout << "+ Adding Root Body " << endl;
+        cout << "  joint frame: " << root_joint_frame << endl;
+        if (floating_base) {
+            cout << "  joint type : floating" << endl;
+        } else {
+            cout << "  joint type : fixed" << endl;
+        }
+        cout << "  body inertia: " << endl << root_link.mInertia << endl;
+        cout << "  body mass   : " << root_link.mMass << endl;
+        cout << "  body name   : " << root->name << endl;
+    }
+
+    rbdl_model->AppendBody(root_joint_frame,
+            root_joint,
+            root_link,
+            root->name);
+
 
 	if (link_stack.top()->child_joints.size() > 0) {
 		joint_index_stack.push(0);
